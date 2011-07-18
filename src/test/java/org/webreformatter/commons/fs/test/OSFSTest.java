@@ -41,9 +41,22 @@ public class OSFSTest extends TestCase {
 
     private void checkFile(IDirectory wroot, String path, String content)
         throws IOException {
+        checkFile(wroot, path, path, content);
+    }
+
+    private void checkFile(
+        IDirectory wroot,
+        String path,
+        String controlPath,
+        String content) throws IOException {
         IFile file = FSUtils.getFile(wroot, path);
         assertNotNull(file);
-        assertEquals(path, file.getPath());
+        assertEquals(controlPath, file.getPath());
+        IFileSystem fs = wroot.getFileSystem();
+        IFileSystemEntry test = fs.getRootDirectory().getEntry(path);
+        assertNotNull(test);
+        assertEquals(file, test);
+
         InputStream in = file.getInputStream();
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         FSUtils.copy(in, out);
@@ -137,6 +150,7 @@ public class OSFSTest extends TestCase {
         addContent(root, "/x/a/b/3.txt", "Hello, world! - 3");
         addContent(root, "/x/a/README.txt", "Readme please...");
         IDirectory dir = FSUtils.getDirectory(root, "x/a");
+
         WrapperFileSystem wfs = new WrapperFileSystem(dir);
         IDirectory wroot = wfs.getRootDirectory();
         assertEquals("/", wroot.getPath());
@@ -144,5 +158,14 @@ public class OSFSTest extends TestCase {
         checkFile(wroot, "/b/2.txt", "Hello, world! - 2");
         checkFile(wroot, "/b/3.txt", "Hello, world! - 3");
         checkFile(wroot, "/README.txt", "Readme please...");
+
+        WrapperFileSystem wfs1 = new WrapperFileSystem("/toto", dir);
+        wroot = wfs1.getRootDirectory();
+        assertEquals("/toto/", wroot.getPath());
+        checkFile(wroot, "/b/1.txt", "/toto/b/1.txt", "Hello, world! - 1");
+        checkFile(wroot, "/b/2.txt", "/toto/b/2.txt", "Hello, world! - 2");
+        checkFile(wroot, "/b/3.txt", "/toto/b/3.txt", "Hello, world! - 3");
+        checkFile(wroot, "/README.txt", "/toto/README.txt", "Readme please...");
+
     }
 }
