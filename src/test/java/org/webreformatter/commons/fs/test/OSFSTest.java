@@ -113,6 +113,22 @@ public class OSFSTest extends TestCase {
         assertTrue(dir instanceof IDirectory);
     }
 
+    public void testRenameFiles() throws IOException {
+        IFileSystem fs = newFileSystem();
+        IDirectory root = fs.getRootDirectory();
+        IFile file = addContent(root, "/x/a/b/1.txt", "Hello, world! - 1");
+        IFileSystemEntry test = root.getEntry("/x/a/b/1.txt");
+        assertEquals(file, test);
+
+        assertTrue(file.renameTo("abc.txt"));
+        test = root.getEntry("/x/a/b/1.txt");
+        assertNull(test);
+
+        test = root.getEntry("/x/a/b/abc.txt");
+        assertNotNull(test);
+        assertEquals("/x/a/b/abc.txt", test.getPath());
+    }
+
     public void testWrapperFS() throws IOException {
         IFileSystem fs = newFileSystem();
         IDirectory root = fs.getRootDirectory();

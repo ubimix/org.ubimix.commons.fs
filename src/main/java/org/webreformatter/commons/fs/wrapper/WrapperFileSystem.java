@@ -192,9 +192,8 @@ public class WrapperFileSystem implements IFileSystem {
             return fEntry.getOutputStream(append);
         }
 
-        public boolean renameTo(IFile file) throws IOException {
-            WrapperFile f = (WrapperFile) file;
-            return fEntry.renameTo(f.fEntry);
+        public boolean renameTo(String name) throws IOException {
+            return fEntry.renameTo(name);
         }
 
     }

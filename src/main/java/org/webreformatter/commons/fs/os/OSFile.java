@@ -13,7 +13,6 @@ import java.io.OutputStream;
 
 import org.webreformatter.commons.fs.IFile;
 
-
 /**
  * @author kotelnikov
  */
@@ -54,10 +53,10 @@ public class OSFile extends OSEntry implements IFile {
     }
 
     /**
-     * @see org.webreformatter.commons.fs.IFile#renameTo(org.webreformatter.commons.fs.IFile)
+     * @see org.webreformatter.commons.fs.IFile#renameTo(String)
      */
-    public boolean renameTo(IFile file) throws IOException {
-        File f = ((OSFile) file).fFile;
+    public boolean renameTo(String name) throws IOException {
+        File f = new File(fFile.getParentFile(), name);
         return fFile.renameTo(f);
     }
 

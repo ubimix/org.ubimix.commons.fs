@@ -33,10 +33,14 @@ public interface IFile extends IFileSystemEntry {
     long getLength();
 
     /**
-     * Returns an output stream used to set a new content.
+     * Returns an output stream used to set a new content. The output stream
+     * returned by this method replaces the content of the file. It works like
+     * the <code>{@link #getOutputStream(boolean) getOutputStream(false)}</code>
+     * call.
      * 
      * @return an output stream used to set a new content
      * @throws IOException
+     * @see {@link #getOutputStream(boolean)}
      */
     OutputStream getOutputStream() throws IOException;
 
@@ -44,21 +48,24 @@ public interface IFile extends IFileSystemEntry {
      * Returns an output stream used to set a new content.
      * 
      * @param append if this flag is <code>true</code> then this method returns
-     *        an output stream appending the content to the end of existing file
-     *        (if it exists)
+     *        an output stream appending the content to the end of existing
+     *        file; otherwise the returned stream replaces already existing
+     *        content.
      * @return an output stream used to set a new content
      * @throws IOException
+     * @see {@link #getOutputStream()}
      */
     OutputStream getOutputStream(boolean append) throws IOException;
 
     /**
-     * Returns <code>true</code> if the file was successfully renamed
+     * Renames this file; this method should just change the name of the file.
+     * Returns <code>true</code> if the file was successfully renamed.
      * 
-     * @param file to which this file should be renamed
+     * @param name new name of the file
      * @return <code>true</code> if the file was successfully renamed
      * @throws IOException an exception can be thrown if an error occurred while
      *         renaming
      */
-    boolean renameTo(IFile file) throws IOException;
+    boolean renameTo(String name) throws IOException;
 
 }
