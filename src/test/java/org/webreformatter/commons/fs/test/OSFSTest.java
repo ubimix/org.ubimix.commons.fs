@@ -5,10 +5,14 @@ package org.webreformatter.commons.fs.test;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
+import junit.framework.TestCase;
+
+import org.webreformatter.commons.fs.FSUtils;
 import org.webreformatter.commons.fs.FileSystemException;
 import org.webreformatter.commons.fs.IDirectory;
 import org.webreformatter.commons.fs.IFile;
@@ -16,9 +20,6 @@ import org.webreformatter.commons.fs.IFileSystem;
 import org.webreformatter.commons.fs.IFileSystemEntry;
 import org.webreformatter.commons.fs.os.OSFileSystem;
 import org.webreformatter.commons.fs.wrapper.WrapperFileSystem;
-
-import junit.framework.TestCase;
-
 
 /**
  * @author kotelnikov
@@ -31,44 +32,29 @@ public class OSFSTest extends TestCase {
 
     private IFile addContent(IDirectory root, String path, String content)
         throws IOException {
-        IFile file = root.getFile(path);
-        file.getParentDirectory().mkdirs();
+        IFile file = FSUtils.getFile(root, path);
         InputStream in = new ByteArrayInputStream(content.getBytes("UTF-8"));
         OutputStream out = file.getOutputStream(false);
-        copy(in, out);
+        FSUtils.copy(in, out);
         return file;
     }
 
     private void checkFile(IDirectory wroot, String path, String content)
         throws IOException {
-        IFile file = wroot.getFile(path);
+        IFile file = FSUtils.getFile(wroot, path);
         assertNotNull(file);
         assertEquals(path, file.getPath());
         InputStream in = file.getInputStream();
         ByteArrayOutputStream out = new ByteArrayOutputStream();
-        copy(in, out);
+        FSUtils.copy(in, out);
         String str = new String(out.toByteArray(), "UTF-8");
         assertEquals(content, str);
     }
 
-    private void copy(InputStream in, OutputStream out) throws IOException {
-        try {
-            try {
-                byte[] buf = new byte[1024];
-                int len;
-                while ((len = in.read(buf)) > 0) {
-                    out.write(buf, 0, len);
-                }
-            } finally {
-                out.close();
-            }
-        } finally {
-            in.close();
-        }
-    }
-
     private OSFileSystem newFileSystem() throws FileSystemException {
-        return new OSFileSystem("./tmp");
+        File dir = new File("./tmp");
+        OSFileSystem fs = new OSFileSystem(dir, true);
+        return fs;
     }
 
     public void testExistingEntries() throws Exception {
@@ -85,23 +71,25 @@ public class OSFSTest extends TestCase {
         assertTrue(entry instanceof IDirectory);
         assertEquals("/a/b/", entry.getPath());
 
-        IFile file = root.getFile("a/b/c.txt/");
+        IFile file = FSUtils.getFile(root, "a/b/c.txt/");
         assertNotNull(file);
         assertEquals("/a/b/c.txt", file.getPath());
 
-        IDirectory dir = root.getDirectory("a/b/");
+        IDirectory dir = FSUtils.getDirectory(root, "a/b/");
         assertNotNull(dir);
         assertTrue(dir instanceof IDirectory);
         assertEquals("/a/b/", dir.getPath());
 
+        assertEquals(dir, file.getParentDirectory());
+
         // Bad requests
         try {
-            dir = root.getDirectory("a/b/c.txt");
+            dir = FSUtils.getDirectory(root, "a/b/c.txt");
             fail();
         } catch (Exception e) {
         }
         try {
-            file = root.getFile("a/b/");
+            file = FSUtils.getFile(root, "a/b/");
             fail();
         } catch (Exception e) {
         }
@@ -112,20 +100,17 @@ public class OSFSTest extends TestCase {
         IFileSystem fs = newFileSystem();
         IDirectory root = fs.getRootDirectory();
 
-        IFile file = root.getFile("/a/b/c");
+        IFileSystemEntry file = root.getEntry("/a/b/file.txt");
+        assertNull(file);
+        file = root.createFile("/a/b/file.txt");
         assertNotNull(file);
-        assertFalse(file.exists());
         assertTrue(file instanceof IFile);
 
-        IDirectory dir = root.getDirectory("/a/b/c");
+        IFileSystemEntry dir = root.getEntry("/a/b/c");
+        assertNull(dir);
+        dir = root.createDirectory("/a/b/c");
         assertNotNull(dir);
-        assertFalse(dir.exists());
         assertTrue(dir instanceof IDirectory);
-
-        // This operations is failed because there is no file nor directory
-        // with such a path
-        IFileSystemEntry entry = root.getEntry("/a/b/c");
-        assertNull(entry);
     }
 
     public void testWrapperFS() throws IOException {
@@ -135,7 +120,7 @@ public class OSFSTest extends TestCase {
         addContent(root, "/x/a/b/2.txt", "Hello, world! - 2");
         addContent(root, "/x/a/b/3.txt", "Hello, world! - 3");
         addContent(root, "/x/a/README.txt", "Readme please...");
-        IDirectory dir = root.getDirectory("x/a");
+        IDirectory dir = FSUtils.getDirectory(root, "x/a");
         WrapperFileSystem wfs = new WrapperFileSystem(dir);
         IDirectory wroot = wfs.getRootDirectory();
         assertEquals("/", wroot.getPath());

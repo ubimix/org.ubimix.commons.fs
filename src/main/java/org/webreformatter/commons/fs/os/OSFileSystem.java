@@ -12,7 +12,6 @@ import org.webreformatter.commons.fs.IFile;
 import org.webreformatter.commons.fs.IFileSystem;
 import org.webreformatter.commons.fs.IFileSystemEntry;
 
-
 /**
  * This is a simple disc-based implementation of the {@link IFileSystem}
  * interface.
@@ -49,13 +48,14 @@ public class OSFileSystem implements IFileSystem {
     public OSFileSystem(File root, boolean reset) throws FileSystemException {
         try {
             if (root.exists()) {
-                if (!root.isDirectory())
+                if (!root.isDirectory()) {
                     throw new IllegalArgumentException(
                         "The specified path is not a directory. Path: "
                             + root.getPath());
+                }
             }
             fRoot = checkFile(root);
-            IDirectory r = getRootDirectory();
+            OSDirectory r = getRootDirectory();
             if (reset) {
                 r.delete();
             }
@@ -110,7 +110,7 @@ public class OSFileSystem implements IFileSystem {
      * @throws FileSystemException
      * @see org.webreformatter.commons.fs.IFileSystem#getRootDirectory()
      */
-    public IDirectory getRootDirectory() throws FileSystemException {
+    public OSDirectory getRootDirectory() throws FileSystemException {
         try {
             return new OSDirectory(this, fRoot);
         } catch (Exception e) {
@@ -118,13 +118,14 @@ public class OSFileSystem implements IFileSystem {
         }
     }
 
-    IDirectory newDirectory(File file) throws FileSystemException {
+    protected IDirectory newDirectory(File file) throws FileSystemException {
         try {
             file = checkFile(file);
-            if (file.exists() && !file.isDirectory())
+            if (file.exists() && !file.isDirectory()) {
                 throw new FileSystemException(
                     "The specified path does not corresponds to a directory. Path: "
                         + file);
+            }
             return new OSDirectory(this, file);
         } catch (FileSystemException e) {
             throw e;
@@ -133,11 +134,12 @@ public class OSFileSystem implements IFileSystem {
         }
     }
 
-    IFileSystemEntry newEntry(File file) throws FileSystemException {
+    protected IFileSystemEntry newEntry(File file) throws FileSystemException {
         try {
             file = checkFile(file);
-            if (!file.exists() || (!file.isDirectory() && !file.isFile()))
+            if (!file.exists() || (!file.isDirectory() && !file.isFile())) {
                 return null;
+            }
             return file.isDirectory()
                 ? new OSDirectory(this, file)
                 : new OSFile(this, file);
@@ -148,13 +150,14 @@ public class OSFileSystem implements IFileSystem {
         }
     }
 
-    IFile newFile(File file) throws FileSystemException {
+    protected IFile newFile(File file) throws FileSystemException {
         try {
             file = checkFile(file);
-            if (file.exists() && !file.isFile())
+            if (file.exists() && !file.isFile()) {
                 throw new FileSystemException(
                     "The specified path does not corresponds to a file. Path: "
                         + file);
+            }
             return new OSFile(this, file);
         } catch (FileSystemException e) {
             throw e;

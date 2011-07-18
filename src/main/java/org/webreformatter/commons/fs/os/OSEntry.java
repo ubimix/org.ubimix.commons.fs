@@ -5,18 +5,20 @@ package org.webreformatter.commons.fs.os;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.webreformatter.commons.fs.FileSystemException;
 import org.webreformatter.commons.fs.IDirectory;
-import org.webreformatter.commons.fs.IFile;
 import org.webreformatter.commons.fs.IFileSystem;
 import org.webreformatter.commons.fs.IFileSystemEntry;
-
 
 /**
  * @author kotelnikov
  */
 public class OSEntry implements IFileSystemEntry {
+
+    private final static Logger log = Logger.getLogger(OSEntry.class.getName());
 
     /**
      * The file on the disc corresponding to this entry.
@@ -55,10 +57,12 @@ public class OSEntry implements IFileSystemEntry {
             path = path.substring(len);
         }
         path = path.replace('\\', '/');
-        if (!path.startsWith("/"))
+        if (!path.startsWith("/")) {
             path = "/" + path;
-        if (path.length() > 0 && path.endsWith("/"))
+        }
+        if (path.length() > 0 && path.endsWith("/")) {
             path = path.substring(0, path.length() - 1);
+        }
         return path;
     }
 
@@ -81,8 +85,9 @@ public class OSEntry implements IFileSystemEntry {
             File[] array = file.listFiles();
             if (array != null) {
                 for (File child : array) {
-                    if (!delete(child))
+                    if (!delete(child)) {
                         return false;
+                    }
                 }
             }
         }
@@ -94,11 +99,13 @@ public class OSEntry implements IFileSystemEntry {
      */
     @Override
     public boolean equals(Object obj) {
-        if (this == obj)
+        if (this == obj) {
             return true;
+        }
         Class<? extends OSEntry> cls = getClass();
-        if (!(cls.isInstance(obj)))
+        if (!(cls.isInstance(obj))) {
             return false;
+        }
         OSEntry entry = (OSEntry) obj;
         return fFile.equals(entry.fFile);
     }
@@ -108,28 +115,6 @@ public class OSEntry implements IFileSystemEntry {
      */
     public boolean exists() {
         return fFile.exists();
-    }
-
-    /**
-     * @see org.webreformatter.commons.fs.IFileSystemEntry#getDirectory()
-     */
-    public IDirectory getDirectory() throws IOException {
-        if (this instanceof IDirectory)
-            return (IDirectory) this;
-        IFileSystem fileSystem = getFileSystem();
-        IDirectory root = fileSystem.getRootDirectory();
-        return root.getDirectory(getPath());
-    }
-
-    /**
-     * @see org.webreformatter.commons.fs.IFileSystemEntry#getFile()
-     */
-    public IFile getFile() throws IOException {
-        if (this instanceof IFile)
-            return (IFile) this;
-        IFileSystem fileSystem = getFileSystem();
-        IDirectory root = fileSystem.getRootDirectory();
-        return root.getFile(getPath());
     }
 
     /**
@@ -150,8 +135,9 @@ public class OSEntry implements IFileSystemEntry {
      * @see org.webreformatter.commons.fs.IFileSystemEntry#getParentDirectory()
      */
     public IDirectory getParentDirectory() throws FileSystemException {
-        if (isRoot())
+        if (isRoot()) {
             return null;
+        }
         return fFileSystem.newDirectory(fFile.getParentFile());
     }
 
@@ -160,6 +146,14 @@ public class OSEntry implements IFileSystemEntry {
      */
     public String getPath() {
         return fPath;
+    }
+
+    protected FileSystemException handleError(String msg, Throwable e) {
+        log.log(Level.FINE, msg, e);
+        if (e instanceof FileSystemException) {
+            return (FileSystemException) e;
+        }
+        return new FileSystemException(msg, e);
     }
 
     /**
@@ -206,8 +200,9 @@ public class OSEntry implements IFileSystemEntry {
      * @see org.webreformatter.commons.fs.IFileSystemEntry#touch(long)
      */
     public boolean touch(long date) throws IOException {
-        if (!fFile.exists())
+        if (!fFile.exists()) {
             fFile.createNewFile();
+        }
         return fFile.setLastModified(date);
     }
 

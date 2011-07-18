@@ -12,6 +12,28 @@ public interface IDirectory
     Iterable<IFileSystemEntry> {
 
     /**
+     * Creates and returns a directory corresponding to the specified path. If
+     * there is already an entry (file or directory) corresponding to this path
+     * then this method rises the {@link FileSystemException}.
+     * 
+     * @param path the path of the directory to create
+     * @return a new directory corresponding to the specified path
+     * @throws FileSystemException
+     */
+    IDirectory createDirectory(String path) throws FileSystemException;
+
+    /**
+     * Creates and returns a file corresponding to the specified path. If there
+     * is already an entry (file or directory) corresponding to this path then
+     * this method rises the {@link FileSystemException}.
+     * 
+     * @param path the path of the file to create
+     * @return a new file corresponding to the specified path
+     * @throws FileSystemException
+     */
+    IFile createFile(String path) throws FileSystemException;
+
+    /**
      * Returns a newly created temporary file in this directory
      * 
      * @param prefix the prefix of the file name
@@ -23,44 +45,14 @@ public interface IDirectory
         throws FileSystemException;
 
     /**
-     * Returns a sub-directory corresponding to the specified path. This method
-     * rises an {@link FileSystemException} if the specified path corresponds to
-     * an existing file and not to a directory.
-     * 
-     * @param path the path of the directory to return
-     * @return a sub-directory corresponding to the specified path
-     * @throws FileSystemException
-     */
-    IDirectory getDirectory(String path) throws FileSystemException;
-
-    /**
-     * Returns a file system entry (file or directory) corresponding to the
-     * specified path.
+     * Returns an existing file system entry (file or directory) corresponding
+     * to the specified path. If there is no items with this path then this
+     * method returns <code>null</code>.
      * 
      * @param path the path of the entry to return
      * @return a file entry corresponding to the specified path
      * @throws FileSystemException
      */
     IFileSystemEntry getEntry(String path) throws FileSystemException;
-
-    /**
-     * Returns a new file corresponding to the given path. This method rises an
-     * {@link FileSystemException} if the specified path corresponds to an
-     * existing directory and not to a file.
-     * 
-     * @param path the path to the file
-     * @return a new file corresponding to the given path
-     * @throws FileSystemException
-     */
-    IFile getFile(String path) throws FileSystemException;
-
-    /**
-     * Creates if necessary this directory and all missing parent directories
-     * from the root of the file system.
-     * 
-     * @return <code>true</code> if directory(-ies) was successfully created
-     * @throws FileSystemException
-     */
-    boolean mkdirs() throws FileSystemException;
 
 }

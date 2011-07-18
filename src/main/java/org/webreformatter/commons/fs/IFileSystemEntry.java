@@ -24,32 +24,6 @@ public interface IFileSystemEntry {
     boolean delete() throws FileSystemException;
 
     /**
-     * Returns <code>true</code> if this entry exists
-     * 
-     * @return <code>true</code> if this entry exists
-     * @throws FileSystemException
-     */
-    boolean exists() throws FileSystemException;
-
-    /**
-     * Returns the directory corresponding to this entry. The returned directory
-     * may be does not exist. This method is the same as the
-     * <code>getFileSystem().getRootDirectory().getDirectory(getPath())<code> method.
-     * 
-     * @return the directory corresponding to this entry
-     */
-    IDirectory getDirectory() throws IOException;
-
-    /**
-     * Returns the file corresponding to this entry. The returned file may be
-     * does not exist. This method is the same as
-     * <code>getFileSystem().getRootDirectory().getFile(getPath())<code>.
-     * 
-     * @return the file corresponding to this entry
-     */
-    IFile getFile() throws IOException;
-
-    /**
      * Returns the file system owning this entry
      * 
      * @return the file system owning this entry

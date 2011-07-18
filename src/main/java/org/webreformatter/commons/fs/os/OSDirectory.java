@@ -14,7 +14,6 @@ import org.webreformatter.commons.fs.IDirectory;
 import org.webreformatter.commons.fs.IFile;
 import org.webreformatter.commons.fs.IFileSystemEntry;
 
-
 /**
  * @author kotelnikov
  */
@@ -31,9 +30,38 @@ public class OSDirectory extends OSEntry implements IDirectory {
     @Override
     protected String buildPath() {
         String path = super.buildPath();
-        if (!path.endsWith("/"))
+        if (!path.endsWith("/")) {
             path += "/";
+        }
         return path;
+    }
+
+    private void checkEmpty(File file, String path) throws FileSystemException {
+        if (file.exists()) {
+            throw new FileSystemException("There is already a file "
+                + "corresponding to this path. Path: '"
+                + path
+                + "'.");
+        }
+    }
+
+    public IDirectory createDirectory(String path) throws FileSystemException {
+        File file = getFile(path);
+        checkEmpty(file, path);
+        file.mkdirs();
+        return fFileSystem.newDirectory(file);
+    }
+
+    public IFile createFile(String path) throws FileSystemException {
+        try {
+            File file = getFile(path);
+            checkEmpty(file, path);
+            file.getParentFile().mkdirs();
+            file.createNewFile();
+            return fFileSystem.newFile(file);
+        } catch (Throwable t) {
+            throw handleError("", t);
+        }
     }
 
     /**
@@ -51,27 +79,16 @@ public class OSDirectory extends OSEntry implements IDirectory {
     }
 
     /**
-     * @see org.webreformatter.commons.fs.IDirectory#getDirectory(java.lang.String)
-     */
-    public IDirectory getDirectory(String path) throws FileSystemException {
-        File file = new File(fFile, path);
-        return fFileSystem.newDirectory(file);
-    }
-
-    /**
      * @see org.webreformatter.commons.fs.IDirectory#getEntry(java.lang.String)
      */
     public IFileSystemEntry getEntry(String path) throws FileSystemException {
-        File file = new File(fFile, path);
+        File file = getFile(path);
         return fFileSystem.newEntry(file);
     }
 
-    /**
-     * @see org.webreformatter.commons.fs.IDirectory#getFile(java.lang.String)
-     */
-    public IFile getFile(String path) throws FileSystemException {
+    private File getFile(String path) throws FileSystemException {
         File file = new File(fFile, path);
-        return fFileSystem.newFile(file);
+        return file;
     }
 
     /**
@@ -97,8 +114,9 @@ public class OSDirectory extends OSEntry implements IDirectory {
 
             public IFileSystemEntry next() {
                 try {
-                    if (array == null || fPos >= array.length)
+                    if (array == null || fPos >= array.length) {
                         return null;
+                    }
                     return fFileSystem.newEntry(array[fPos++]);
                 } catch (FileSystemException e) {
                     return null;

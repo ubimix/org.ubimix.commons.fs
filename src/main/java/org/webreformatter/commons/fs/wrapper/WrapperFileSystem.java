@@ -30,26 +30,27 @@ public class WrapperFileSystem implements IFileSystem {
             super(entry);
         }
 
+        public IDirectory createDirectory(String path)
+            throws FileSystemException {
+            IDirectory entry = fEntry.createDirectory(path);
+            return wrapEntry(entry);
+        }
+
+        public IFile createFile(String path) throws FileSystemException {
+            IFile entry = fEntry.createFile(path);
+            return wrapEntry(entry);
+        }
+
         public IFile createTempFile(String prefix, String suffix)
             throws FileSystemException {
             IFile file = fEntry.createTempFile(prefix, suffix);
             return new WrapperFile(file);
         }
 
-        public IDirectory getDirectory(String path) throws FileSystemException {
-            IDirectory dir = fEntry.getDirectory(path);
-            return dir != null ? new WrapperDirectory(dir) : null;
-        }
-
         public IFileSystemEntry getEntry(String path)
             throws FileSystemException {
             IFileSystemEntry entry = fEntry.getEntry(path);
             return wrapEntry(entry);
-        }
-
-        public IFile getFile(String path) throws FileSystemException {
-            IFile dir = fEntry.getFile(path);
-            return dir != null ? new WrapperFile(dir) : null;
         }
 
         public Iterator<IFileSystemEntry> iterator() {
@@ -72,16 +73,15 @@ public class WrapperFileSystem implements IFileSystem {
             };
         }
 
-        public boolean mkdirs() throws FileSystemException {
-            return fEntry.mkdirs();
-        }
-
-        private IFileSystemEntry wrapEntry(IFileSystemEntry entry) {
+        @SuppressWarnings("unchecked")
+        private <E extends IFileSystemEntry> E wrapEntry(E entry) {
             if (entry == null) {
                 return null;
             }
-            return (entry instanceof IDirectory) ? new WrapperDirectory(
-                (IDirectory) entry) : new WrapperFile((IFile) entry);
+            WrapperEntry<? extends IFileSystemEntry> e = (entry instanceof IDirectory)
+                ? new WrapperDirectory((IDirectory) entry)
+                : new WrapperFile((IFile) entry);
+            return (E) e;
         }
 
     }
@@ -113,28 +113,6 @@ public class WrapperFileSystem implements IFileSystem {
             }
             WrapperEntry<?> entry = (WrapperEntry<?>) obj;
             return fEntry.equals(entry.fEntry);
-        }
-
-        public boolean exists() throws FileSystemException {
-            return fEntry.exists();
-        }
-
-        /**
-         * @see org.webreformatter.commons.fs.IFileSystemEntry#getDirectory()
-         */
-        public IDirectory getDirectory() throws IOException {
-            IFileSystem fileSystem = getFileSystem();
-            IDirectory root = fileSystem.getRootDirectory();
-            return root.getDirectory(getPath());
-        }
-
-        /**
-         * @see org.webreformatter.commons.fs.IFileSystemEntry#getFile()
-         */
-        public IFile getFile() throws IOException {
-            IFileSystem fileSystem = getFileSystem();
-            IDirectory root = fileSystem.getRootDirectory();
-            return root.getFile(getPath());
         }
 
         public IFileSystem getFileSystem() {
