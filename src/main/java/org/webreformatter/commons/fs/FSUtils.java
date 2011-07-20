@@ -1,5 +1,7 @@
 package org.webreformatter.commons.fs;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -62,5 +64,39 @@ public class FSUtils {
             file = (IFile) entry;
         }
         return file;
+    }
+
+    public static String readString(IFile file) throws IOException {
+        return readString(file.getInputStream());
+    }
+
+    public static String readString(InputStream input) throws IOException {
+        try {
+            ByteArrayOutputStream out = new ByteArrayOutputStream();
+            try {
+                copy(input, out);
+            } finally {
+                out.close();
+            }
+            byte[] array = out.toByteArray();
+            return new String(array, "UTF-8");
+        } finally {
+            input.close();
+        }
+    }
+
+    public static void writeString(String str, IFile file) throws IOException {
+        writeString(str, file.getOutputStream());
+    }
+
+    public static void writeString(String str, OutputStream output)
+        throws IOException {
+        try {
+            byte[] array = str.getBytes("UTF-8");
+            ByteArrayInputStream input = new ByteArrayInputStream(array);
+            copy(input, output);
+        } finally {
+            output.close();
+        }
     }
 }
