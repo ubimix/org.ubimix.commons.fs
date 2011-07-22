@@ -52,12 +52,4 @@ public class OSFile extends OSEntry implements IFile {
         return new BufferedOutputStream(new FileOutputStream(fFile));
     }
 
-    /**
-     * @see org.webreformatter.commons.fs.IFile#renameTo(String)
-     */
-    public boolean renameTo(String name) throws IOException {
-        File f = new File(fFile.getParentFile(), name);
-        return fFile.renameTo(f);
-    }
-
 }

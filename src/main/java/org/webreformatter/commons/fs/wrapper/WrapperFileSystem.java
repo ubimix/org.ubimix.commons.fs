@@ -74,6 +74,10 @@ public class WrapperFileSystem implements IFileSystem {
             };
         }
 
+        public boolean renameTo(String name) throws IOException {
+            return fEntry.renameTo(name);
+        }
+
         @SuppressWarnings("unchecked")
         private <E extends IFileSystemEntry> E wrapEntry(E entry) {
             if (entry == null) {
@@ -152,7 +156,7 @@ public class WrapperFileSystem implements IFileSystem {
                 path = path.substring(0, path.length() - 1);
             }
             int idx = path.lastIndexOf('/');
-            if (idx > 0) {
+            if (idx >= 0) {
                 path = path.substring(0, idx);
             }
             IFileSystemEntry entry = fFileSystem.getEntry(path);

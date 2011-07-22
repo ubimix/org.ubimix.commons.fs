@@ -57,15 +57,4 @@ public interface IFile extends IFileSystemEntry {
      */
     OutputStream getOutputStream(boolean append) throws IOException;
 
-    /**
-     * Renames this file; this method should just change the name of the file.
-     * Returns <code>true</code> if the file was successfully renamed.
-     * 
-     * @param name new name of the file
-     * @return <code>true</code> if the file was successfully renamed
-     * @throws IOException an exception can be thrown if an error occurred while
-     *         renaming
-     */
-    boolean renameTo(String name) throws IOException;
-
 }

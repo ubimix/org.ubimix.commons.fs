@@ -182,6 +182,14 @@ public class OSEntry implements IFileSystemEntry {
     }
 
     /**
+     * @see org.webreformatter.commons.fs.IFileSystemEntry#renameTo(java.lang.String)
+     */
+    public boolean renameTo(String name) throws IOException {
+        File f = new File(fFile.getParentFile(), name);
+        return fFile.renameTo(f);
+    }
+
+    /**
      * @see java.lang.Object#toString()
      */
     @Override

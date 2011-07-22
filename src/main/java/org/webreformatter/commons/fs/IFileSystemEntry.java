@@ -65,6 +65,17 @@ public interface IFileSystemEntry {
     long lastModified();
 
     /**
+     * Renames this file; this method should just change the name of the file.
+     * Returns <code>true</code> if the file was successfully renamed.
+     * 
+     * @param name new name of the file
+     * @return <code>true</code> if the file was successfully renamed
+     * @throws IOException an exception can be thrown if an error occurred while
+     *         renaming
+     */
+    boolean renameTo(String name) throws IOException;
+
+    /**
      * Sets the current modification to the file; if the file does not exists
      * then this method will create a new empty file.
      * 
