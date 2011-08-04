@@ -57,6 +57,13 @@ public class FSUtils {
             dir = (IDirectory) entry;
         } else if (entry == null && create) {
             dir = root.createDirectory(path);
+        } else if (entry != null) {
+            throw new IllegalArgumentException("Can not create a directory. "
+                + "There is already a file "
+                + "corresponding to the specified path. "
+                + "Path: '"
+                + path
+                + "'.");
         }
         return dir;
     }
@@ -74,6 +81,13 @@ public class FSUtils {
             file = (IFile) entry;
         } else if (entry == null && create) {
             file = root.createFile(path);
+        } else if (entry != null) {
+            throw new IllegalArgumentException("Can not create a file. "
+                + "There is already a directory "
+                + "(or something else) corresponding to the specified path. "
+                + "Path: '"
+                + path
+                + "'.");
         }
         return file;
     }
