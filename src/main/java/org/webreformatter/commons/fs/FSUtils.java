@@ -44,24 +44,36 @@ public class FSUtils {
 
     public static IDirectory getDirectory(IDirectory root, String path)
         throws FileSystemException {
+        return getDirectory(root, path, true);
+    }
+
+    public static IDirectory getDirectory(
+        IDirectory root,
+        String path,
+        boolean create) throws FileSystemException {
         IFileSystemEntry entry = root.getEntry(path);
-        IDirectory file = null;
-        if (!(entry instanceof IDirectory)) {
-            file = root.createDirectory(path);
-        } else {
-            file = (IDirectory) entry;
+        IDirectory dir = null;
+        if (entry instanceof IDirectory) {
+            dir = (IDirectory) entry;
+        } else if (entry == null && create) {
+            dir = root.createDirectory(path);
         }
-        return file;
+        return dir;
     }
 
     public static IFile getFile(IDirectory root, String path)
         throws FileSystemException {
+        return getFile(root, path, true);
+    }
+
+    public static IFile getFile(IDirectory root, String path, boolean create)
+        throws FileSystemException {
         IFileSystemEntry entry = root.getEntry(path);
         IFile file = null;
-        if (!(entry instanceof IFile)) {
-            file = root.createFile(path);
-        } else {
+        if (entry instanceof IFile) {
             file = (IFile) entry;
+        } else if (entry == null && create) {
+            file = root.createFile(path);
         }
         return file;
     }
